@@ -63,7 +63,7 @@ if not WGET_LUA:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20180703.02'
+VERSION = '20180729.01'
 USER_AGENT = 'ArchiveTeam'
 TRACKER_ID = 'tindeck'
 TRACKER_HOST = 'tracker.archiveteam.org'
@@ -142,7 +142,6 @@ class Deduplicate(SimpleTask):
         warc_input = warc.WARCFile(input_filename)
         warc_input_size = os.path.getsize(input_filename)
         warc_output = warc.WARCFile(output_filename, 'w')
-        dedup_log = []
 
         info_record = warc_input.read_record()
         info_record.header['WARC-Filename'] = "%(warc_file_base)s-deduplicated.warc.gz" % item
@@ -175,15 +174,6 @@ class Deduplicate(SimpleTask):
                             record.header['WARC-Profile'] = 'http://netpreserve' \
                                 '.org/warc/1.0/revisit/identical-payload-digest'
                             del record.header['WARC-Block-Digest']
-                            dedup_log.append('WARC-Record-ID:{dID}; ' \
-                                'WARC-Target-URI:{dURL}; WARC-Date:{dDate} ' \
-                                'duplicate of WARC-Record-ID:{oID}; ' \
-                                'WARC-Target-URI:{oURL}; WARC-Date:{oDate}\r\n' \
-                                .format(dID=record.header['WARC-Record-ID'],
-                                dURL=record.header['WARC-Target-URI'],
-                                dDate=record.header['WARC-Date'],
-                                oID=hashes[hash_][0], oURL=hashes[hash_][2],
-                                oDate=hashes[hash_][1]))
                             record = warc.WARCRecord(header=record.header,
                                 payload=payload, defaults=False)
                         else:
@@ -200,8 +190,6 @@ class Deduplicate(SimpleTask):
                     record = warc.WARCRecord(header=record.header,
                         payload=record.payload.read(), defaults=False)
                 warc_output.write_record(record)
-        with open("%(item_dir)s/deduplicate.log" % item, 'w') as f:
-            f.write('\r\n'.join(dedup_log))
 
 
 class MoveFiles(SimpleTask):
