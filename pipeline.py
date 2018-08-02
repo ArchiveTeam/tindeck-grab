@@ -63,7 +63,7 @@ if not WGET_LUA:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20180729.03'
+VERSION = '20180802.01'
 USER_AGENT = 'ArchiveTeam'
 TRACKER_ID = 'tindeck'
 TRACKER_HOST = 'tracker.archiveteam.org'
@@ -264,6 +264,12 @@ class WgetArgs(object):
         if item_type == 'track':
             wget_args.extend(['--warc-header', 'tindeck-track: {}'.format(item_value)])
             wget_args.append('http://tindeck.com/listen/{}'.format(item_value))
+        elif item_type == 'user':
+            item_value
+            wget_args.extend(['--warc-header', 'tindeck-user: {}'.format(item_value)])
+            wget_args.append('http://tindeck.com/message?u={}'.format(item_value))
+            wget_args.append('http://tindeck.com/rss/user/{}.rss'.format(item_value))
+            wget_args.append('http://tindeck.com/users/{}'.format(item_value))
         else:
             raise Exception('Unknown item')
 
